@@ -23,32 +23,49 @@ namespace MyClassesTest
             //todo cleanup after all the tests in class.
         }
 
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            TestContext.WriteLine("In TestInitialize() Method");
+            if (TestContext.TestName.StartsWith("FileNameDoesExist"))
+            {
+                SetGoodFileName();
+                if(!string.IsNullOrEmpty(_GoodFileName))
+                {
+                    TestContext.WriteLine("Creating file: " + _GoodFileName);
+                    //creating the good file.
+                    File.AppendAllText(_GoodFileName, "Some text");
+                }
+            }
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            TestContext.WriteLine("In TestCleanup() method");
+
+            if (TestContext.TestName.StartsWith("FileNameDoesExist"))
+            {
+                //Delete the file
+                if (File.Exists(_GoodFileName))
+                {
+                    TestContext.WriteLine("Deleting file:" + _GoodFileName);
+                    File.Delete(_GoodFileName);
+                }
+            }
+        }
+
         [TestMethod]
         public void FileNameDoesExist() 
         {
             FileProcess fp = new FileProcess();
             bool fromCall;
-
-            SetGoodFileName();
-
-            if (!string.IsNullOrEmpty(_GoodFileName))
-            {
-                //Creating a 'Good' file.
-                File.AppendAllText(_GoodFileName, "Some Text");
-            }
-
+            
             TestContext.WriteLine("Checking File" + _GoodFileName);
 
             bool v = fp.FileExists(_GoodFileName);
 
             fromCall = v;
-
-            //delete the file 
-
-            if (File.Exists(_GoodFileName))
-            {
-                File.Delete(_GoodFileName);
-            }
 
             Assert.IsTrue(fromCall);
         }
@@ -59,7 +76,7 @@ namespace MyClassesTest
             FileProcess fp = new FileProcess();
             bool fromCall;
 
-            TestContext.Write("Checking for a Null File");
+            TestContext.Write("Checking for a Null File ");
 
             fromCall = fp.FileExists("Checking file" + BAD_FILE_NAME);
 
