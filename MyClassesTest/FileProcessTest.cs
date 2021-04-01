@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyClasses;
 
@@ -7,20 +8,49 @@ namespace MyClassesTest
     [TestClass]
     public class FileProcessTest
     {
+        protected string _GoodFileName;
         private const string BAD_FILE_NAME = @"C:/NotExists.bad";
 
         public TestContext TestContext { get; set; }  
 
+        protected void SetGoodFileName()
+        {
+            _GoodFileName = TestContext.Properties["GoodFileName"].ToString();
+
+            if (_GoodFileName.Contains("[AppPath]"))
+            {
+                string v = _GoodFileName.Replace("[AppPath]",
+                                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+                _GoodFileName = v;
+            }
+        }
+
         [TestMethod]
-        public void FileNameDoesExist()
+        public void FileNameDoesExist() 
         {
             FileProcess fp = new FileProcess();
             bool fromCall;
 
-            TestContext.WriteLine("Checking File" + BAD_FILE_NAME);
+            SetGoodFileName();
 
-            bool v = fp.FileExists(@"c:/windows/regedit.exe");
+            if (!string.IsNullOrEmpty(_GoodFileName))
+            {
+                //Creating a 'Good' file.
+                File.AppendAllText(_GoodFileName, "Some Text");
+            }
+
+            TestContext.WriteLine("Checking File" + _GoodFileName);
+
+            bool v = fp.FileExists(_GoodFileName);
+
             fromCall = v;
+
+            //delete the file 
+
+            if (File.Exists(_GoodFileName))
+            {
+                File.Delete(_GoodFileName);
+            }
 
             Assert.IsTrue(fromCall);
         }
@@ -31,7 +61,9 @@ namespace MyClassesTest
             FileProcess fp = new FileProcess();
             bool fromCall;
 
-            fromCall = fp.FileExists(BAD_FILE_NAME);
+            TestContext.Write("Checking for a Null File");
+
+            fromCall = fp.FileExists("Checking file" + BAD_FILE_NAME);
 
             Assert.IsFalse(fromCall);
         }
@@ -41,7 +73,9 @@ namespace MyClassesTest
         public void FileNameNullOrEmpty_UsingAttribute()
         {
             FileProcess fp = new FileProcess();
+
             TestContext.Write("Checking for a Null File");
+
             fp.FileExists(""); 
         }
 
