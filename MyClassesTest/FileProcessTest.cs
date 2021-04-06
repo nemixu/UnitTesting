@@ -8,9 +8,9 @@ namespace MyClassesTest
     [TestClass]
     public class FileProcessTest : TestBase
     {
-        
-        private const string BAD_FILE_NAME = @"C:/NotExists.bad";
 
+        private const string BAD_FILE_NAME = @"C:/NotExists.bad";
+        // test initialization methods and cleanups.
         [ClassInitialize()]
         public static void ClassInitialize(TestContext tc)
         {
@@ -30,7 +30,7 @@ namespace MyClassesTest
             if (TestContext.TestName.StartsWith("FileNameDoesExist"))
             {
                 SetGoodFileName();
-                if(!string.IsNullOrEmpty(_GoodFileName))
+                if (!string.IsNullOrEmpty(_GoodFileName))
                 {
                     TestContext.WriteLine("Creating file: " + _GoodFileName);
                     //creating the good file.
@@ -55,7 +55,13 @@ namespace MyClassesTest
             }
         }
 
+
+        // Testing methods 
+
+
         [TestMethod]
+        [Description("Check to see if a file exists.")]
+        [Owner("Stevo")]
         public void FileNameDoesExist() 
         {
             FileProcess fp = new FileProcess();
@@ -71,6 +77,8 @@ namespace MyClassesTest
         }
 
         [TestMethod]
+        [Description("Check to see if a file does not exist.")]
+        [Owner("Stevo")]
         public void FileNameDoesNotExist()
         {
             FileProcess fp = new FileProcess();
@@ -85,6 +93,8 @@ namespace MyClassesTest
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
+        [Description("Check for a thrown ArgNullException using ExpectedException")]
+        [Owner("Stevo")]
         public void FileNameNullOrEmpty_UsingAttribute()
         {
             FileProcess fp = new FileProcess();
@@ -95,6 +105,8 @@ namespace MyClassesTest
         }
 
         [TestMethod]
+        [Description("Check for a thrown ArgNullException using try...catch.")]
+        [Owner("Stevo")]
         public void FileNameNullOrEmpty_UsingTryCatch()
         {
             FileProcess fp = new FileProcess();
